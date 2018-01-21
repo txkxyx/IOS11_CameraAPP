@@ -14,6 +14,8 @@
 		C05EDD8C200614A300FA6C0C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C05EDD8A200614A300FA6C0C /* LaunchScreen.storyboard */; };
 		C05EDD97200614A300FA6C0C /* VideoRecorderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05EDD96200614A300FA6C0C /* VideoRecorderTests.swift */; };
 		C05EDDA2200614A300FA6C0C /* VideoRecorderUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05EDDA1200614A300FA6C0C /* VideoRecorderUITests.swift */; };
+		C0E6B9C8200CF5770032A311 /* PreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E6B9C7200CF5770032A311 /* PreviewViewController.swift */; };
+		C0E6B9CA201434740032A311 /* RecordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E6B9C9201434740032A311 /* RecordViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +49,8 @@
 		C05EDD9D200614A300FA6C0C /* VideoRecorderUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VideoRecorderUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C05EDDA1200614A300FA6C0C /* VideoRecorderUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRecorderUITests.swift; sourceTree = "<group>"; };
 		C05EDDA3200614A300FA6C0C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C0E6B9C7200CF5770032A311 /* PreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewViewController.swift; sourceTree = "<group>"; };
+		C0E6B9C9201434740032A311 /* RecordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +107,8 @@
 				C05EDD88200614A300FA6C0C /* Assets.xcassets */,
 				C05EDD8A200614A300FA6C0C /* LaunchScreen.storyboard */,
 				C05EDD8D200614A300FA6C0C /* Info.plist */,
+				C0E6B9C7200CF5770032A311 /* PreviewViewController.swift */,
+				C0E6B9C9201434740032A311 /* RecordViewController.swift */,
 			);
 			path = VideoRecorder;
 			sourceTree = "<group>";
@@ -261,6 +267,8 @@
 			files = (
 				C05EDD84200614A300FA6C0C /* ViewController.swift in Sources */,
 				C05EDD82200614A300FA6C0C /* AppDelegate.swift in Sources */,
+				C0E6B9C8200CF5770032A311 /* PreviewViewController.swift in Sources */,
+				C0E6B9CA201434740032A311 /* RecordViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -429,11 +437,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6TW975U2T3;
 				INFOPLIST_FILE = VideoRecorder/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = jp.kronos.iaspeedgun.videorecoder.VideoRecorder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -444,11 +453,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6TW975U2T3;
 				INFOPLIST_FILE = VideoRecorder/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = jp.kronos.iaspeedgun.videorecoder.VideoRecorder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

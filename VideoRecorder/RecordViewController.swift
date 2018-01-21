@@ -1,31 +1,27 @@
 //
-//  ViewController.swift
+//  RecordViewController.swift
 //  VideoRecorder
 //
-//  Created by 岡本拓也 on 2018/01/10.
+//  Created by 岡本拓也 on 2018/01/21.
 //  Copyright © 2018年 takuya okamoto. All rights reserved.
 //
 
 import UIKit
 import AVFoundation
-import Photos
+import AVKit
 
-class ViewController: UIViewController {
+class RecordViewController: UIViewController, AVCaptureFileOutputRecordingDelegate {
+
+    @IBOutlet weak var recordButton: UIButton!
     
-    @IBOutlet weak var cameraButton: UIButton!
-    
-    var captureSession = AVCaptureSession()
-    
+    let captureSession = AVCaptureSession()
     var backCamera: AVCaptureDevice?
     var frontCamera: AVCaptureDevice?
     var currentDevice: AVCaptureDevice?
-    
-    var photoOutput: AVCapturePhotoOutput?
-    
+    var videoFileOutput:AVCaptureMovieFileOutput?
     var cameraPreviewLayer:AVCaptureVideoPreviewLayer?
     
-    var image: UIImage?
-    
+    var isRecording = false
     var toggleCameraGestureRecognizer = UISwipeGestureRecognizer()
     
     var zoomInGestureRecognizer = UISwipeGestureRecognizer()
@@ -37,7 +33,8 @@ class ViewController: UIViewController {
         setupDevice()
         setupInputOutput()
         setupPreviewLayer()
-        captureSession.startRunning()
+        startRunningCaptureSession()
+        
         
         toggleCameraGestureRecognizer.direction = .up
         toggleCameraGestureRecognizer.addTarget(self, action: #selector(self.switchCamera))
@@ -52,19 +49,10 @@ class ViewController: UIViewController {
         zoomOutGestureRecognizer.direction = .left
         zoomOutGestureRecognizer.addTarget(self, action: #selector(zoomOut))
         view.addGestureRecognizer(zoomOutGestureRecognizer)
-        styleCaptureButton()
-    }
-    
-    
-    func styleCaptureButton() {
-        cameraButton.layer.borderColor = UIColor.white.cgColor
-        cameraButton.layer.borderWidth = 5
-        cameraButton.clipsToBounds = true
-        cameraButton.layer.cornerRadius = min(cameraButton.frame.width, cameraButton.frame.height) / 2
     }
     
     func setupCaptureSession() {
-        captureSession.sessionPreset = AVCaptureSession.Preset.photo
+        captureSession.sessionPreset = AVCaptureSession.Preset.high
     }
     
     func setupDevice() {
@@ -79,31 +67,70 @@ class ViewController: UIViewController {
             }
         }
         currentDevice = backCamera
+        
     }
     
     func setupInputOutput() {
         do {
-            
             let captureDeviceInput = try AVCaptureDeviceInput(device: currentDevice!)
             captureSession.addInput(captureDeviceInput)
-            photoOutput = AVCapturePhotoOutput()
-            photoOutput!.setPreparedPhotoSettingsArray([AVCapturePhotoSettings(format: [AVVideoCodecKey : AVVideoCodecType.jpeg])], completionHandler: nil)
-            captureSession.addOutput(photoOutput!)
-            
-            
+            videoFileOutput = AVCaptureMovieFileOutput()
+            captureSession.addOutput(videoFileOutput!)
         } catch {
             print(error)
         }
     }
     
     func setupPreviewLayer() {
-        self.cameraPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        self.cameraPreviewLayer?.videoGravity = AVLayerVideoGravity.resizeAspectFill
-        self.cameraPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
-        self.cameraPreviewLayer?.frame = view.frame
-        
-        self.view.layer.insertSublayer(self.cameraPreviewLayer!, at: 0)
+        cameraPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+        cameraPreviewLayer?.videoGravity = AVLayerVideoGravity.resizeAspectFill
+        cameraPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
+        cameraPreviewLayer?.frame = self.view.frame
+        self.view.layer.insertSublayer(cameraPreviewLayer!, at: 0)
     }
+    
+    func startRunningCaptureSession() {
+        captureSession.startRunning()
+    }
+    // MARK: - Action methods
+    
+    @IBAction func unwindToCamera(segue:UIStoryboardSegue) {
+        
+    }
+    
+    @IBAction func capture(sender: UIButton) {
+        if !isRecording {
+            isRecording = true
+            
+            UIView.animate(withDuration: 0.5, delay: 0.0, options: [.repeat, .autoreverse, .allowUserInteraction], animations: { () -> Void in
+                self.recordButton.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+            }, completion: nil)
+            
+            let outputPath = NSTemporaryDirectory() + "output.mov"
+            let outputFileURL = URL(fileURLWithPath: outputPath)
+            videoFileOutput?.startRecording(to: outputFileURL, recordingDelegate: self)
+        } else {
+            isRecording = false
+            
+            UIView.animate(withDuration: 0.5, delay: 1.0, options: [], animations: { () -> Void in
+                self.recordButton.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+            }, completion: nil)
+            recordButton.layer.removeAllAnimations()
+            videoFileOutput?.stopRecording()
+        }
+    }
+    
+    
+    // MARK: - AVCaptureFileOutputRecordingDelegate methods
+    func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
+        if error != nil {
+            print(error)
+            return
+        }
+        
+        performSegue(withIdentifier: "playVideo", sender: outputFileURL)
+    }
+    
     
     
     @objc func switchCamera() {
@@ -164,27 +191,13 @@ class ViewController: UIViewController {
         }
     }
     
-    @IBAction func cameraButton_TouchUpInside(_ sender: Any) {
-        let settings = AVCapturePhotoSettings()
-        self.photoOutput?.capturePhoto(with: settings, delegate: self)
-    }
+    
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "showPhoto_Segue" {
-            let previewViewController = segue.destination as! PreviewViewController
-            previewViewController.image = self.image
+        if segue.identifier == "playVideo" {
+            let videoPlayerViewController = segue.destination as! AVPlayerViewController
+            let videoFileURL = sender as! URL
+            videoPlayerViewController.player = AVPlayer(url: videoFileURL)
         }
     }
 }
-
-extension ViewController: AVCapturePhotoCaptureDelegate {
-    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        if let imageData = photo.fileDataRepresentation() {
-            self.image = UIImage(data: imageData)
-//            UIImageWriteToSavedPhotosAlbum(UIImage(data: imageData)!, nil, nil, nil)
-            dismiss(animated: true, completion: nil)
-            performSegue(withIdentifier: "showPhoto_Segue", sender: nil)
-        }
-    }
-}
-
